@@ -58,6 +58,9 @@ public class AttachmentManager {
         return attach;
     }
 
+
+
+
     /**
      * Uploads an attachment.
      *
@@ -77,7 +80,7 @@ public class AttachmentManager {
                                        byte[] content) throws RedmineException, IOException {
         final InputStream is = new ByteArrayInputStream(content);
         try {
-            return uploadAttachment(fileName, contentType, is);
+            return uploadAttachment(fileName, contentType, is, content.length);
         } finally {
             try {
                 is.close();
@@ -104,7 +107,7 @@ public class AttachmentManager {
             throws RedmineException, IOException {
         final InputStream is = new FileInputStream(content);
         try {
-            return uploadAttachment(content.getName(), contentType, is);
+            return uploadAttachment(content.getName(), contentType, is, (int) content.length());
         } finally {
             is.close();
         }
@@ -128,12 +131,12 @@ public class AttachmentManager {
      *             reading errors and transport errors.
      */
     public Attachment uploadAttachment(String fileName, String contentType,
-                                       InputStream content) throws RedmineException, IOException {
+                                       InputStream content, int size) throws RedmineException, IOException {
         final InputStream wrapper = new MarkedInputStream(content,
                 "uploadStream");
         final String token;
         try {
-            token = transport.upload(wrapper);
+            token = transport.upload(wrapper, size);
             final Attachment result = AttachmentFactory.create();
             result.setToken(token);
             result.setContentType(contentType);

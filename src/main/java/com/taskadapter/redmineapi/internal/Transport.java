@@ -67,6 +67,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.http.entity.FileEntity;
 
 public final class Transport {
 	private static final Map<Class<?>, EntityConfig<?>> OBJECT_CONFIGS = new HashMap<Class<?>, EntityConfig<?>>();
@@ -459,6 +460,20 @@ public final class Transport {
 			throw new RedmineFormatException(e);
 		}
 	}
+
+    
+
+    public String upload(InputStream content, int size) throws RedmineException {
+        final URI uploadURI = getURIConfigurator().getUploadURI();
+		final HttpPost request = new HttpPost(uploadURI);
+		final AbstractHttpEntity entity = new InputStreamEntity(content, size);
+		/* Content type required by a Redmine */
+		entity.setContentType("application/octet-stream");
+		request.setEntity(entity);
+
+		final String result = send(request);
+		return parseResponse(result, "upload", RedmineJSONParser.UPLOAD_TOKEN_PARSER);
+    }
 
 	public static class ResultsWrapper<T> {
 		final private Integer totalFoundOnServer;
