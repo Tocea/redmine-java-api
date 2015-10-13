@@ -113,7 +113,7 @@ public class Attachment implements Identifiable {
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return token != null ? token.hashCode() : 0;
     }
 
     @Override
